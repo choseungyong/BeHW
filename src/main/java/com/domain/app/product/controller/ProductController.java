@@ -5,6 +5,10 @@ import com.domain.app.product.dto.ProductResponseDto;
 import com.domain.app.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +22,24 @@ public class ProductController {
 
     private final ProductService productservice;
 
-    @GetMapping
+    @GetMapping(params = "!page")
     public ResponseEntity<List<ProductResponseDto>> getAll() {
-        return ResponseEntity.ok(productservice.getAll());
+        List<ProductResponseDto> list = productservice.getAll();
+        return ResponseEntity.ok(list);
     }
 
+    /**
+     * 페이징 조회 (page 파라미터가 있을 때)
+     * GET /api/products?page=0&size=20&sort=name,asc
+     */
+    @GetMapping
+    public ResponseEntity<Page<ProductResponseDto>> list(
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC)
+            Pageable pageable
+    ) {
+        Page<ProductResponseDto> page = productservice.getPage(pageable);
+        return ResponseEntity.ok(page);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getInfo(@PathVariable Long id){
         return ResponseEntity.ok(productservice.findById(id));

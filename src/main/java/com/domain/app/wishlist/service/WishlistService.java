@@ -8,6 +8,8 @@ import com.domain.app.wishlist.dto.WishlistRequestDto;
 import com.domain.app.wishlist.dto.WishlistResponseDto;
 import com.domain.app.wishlist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +24,16 @@ public class WishlistService {
     private final WishlistRepository wishlistRepository;
     private final ProductRepository productRepository;
 
+    // 기존 Page 반환 메서드
+    public Page<WishlistResponseDto> getWishes(Member member, Pageable pageable) {
+        return wishlistRepository.findAllByMember(member, pageable)
+                .map(w -> new WishlistResponseDto(w.getProduct().getId()));
+    }
+
+    // **테스트 호환용** List 반환 메서드 추가
     public List<WishlistResponseDto> getWishes(Member member) {
-        return wishlistRepository.findAllByMember(member).stream()
-                .map(w -> new WishlistResponseDto(w.getProduct().getId()))
-                .collect(Collectors.toList());
+        return getWishes(member, Pageable.unpaged())
+                .getContent();
     }
 
     @Transactional
