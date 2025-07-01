@@ -1,6 +1,8 @@
 package com.domain.app.wishlist.service;
 
 import com.domain.app.member.domain.Member;
+import com.domain.app.product.domain.Product;
+import com.domain.app.product.repository.ProductRepository;
 import com.domain.app.wishlist.domain.Wishlist;
 import com.domain.app.wishlist.dto.WishlistRequestDto;
 import com.domain.app.wishlist.dto.WishlistResponseDto;
@@ -18,25 +20,40 @@ import java.util.stream.Collectors;
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
+    private final ProductRepository productRepository;
 
-    public List<WishlistResponseDto> getWishes(Long memberId) {
-        return wishlistRepository.findAllByMemberId(memberId).stream()
-                .map(w -> new WishlistResponseDto(w.getProductId()))
+    public List<WishlistResponseDto> getWishes(Member member) {
+        return wishlistRepository.findAllByMember(member).stream()
+                .map(w -> new WishlistResponseDto(w.getProduct().getId()))
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public void addWish(Member member, WishlistRequestDto req) {
+        // 1) 상품 엔티티 조회
+        Product product = productRepository.findById(req.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+        // 2) 중복 체크
         boolean exists = wishlistRepository
-                .findByMemberIdAndProductId(member.getId(), req.getProductId())
+                .findByMemberAndProduct(member, product)
                 .isPresent();
-        if (!exists) {
-            wishlistRepository.save(new Wishlist(member, req.getProductId()));
+        if (exists) {
+            return; // 혹은 예외 던지기
         }
+
+        // 3) 연관관계로 위시 생성
+        Wishlist wish = new Wishlist(member, product);
+        wishlistRepository.save(wish);
     }
 
     @Transactional
-    public void removeWish(Long memberId, Long productId) {
-        wishlistRepository.deleteByMemberIdAndProductId(memberId, productId);
+    public void removeWish(Member member, Long productId) {
+        // 1) 상품 엔티티 조회
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+        // 2) 삭제
+        wishlistRepository.deleteByMemberAndProduct(member, product);
     }
 }

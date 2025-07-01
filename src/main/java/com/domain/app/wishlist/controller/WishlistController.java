@@ -20,7 +20,7 @@ public class WishlistController {
 
     @GetMapping
     public List<WishlistResponseDto> list(@LoginMember Member member) {
-        return wishlistService.getWishes(member.getId());
+        return wishlistService.getWishes(member);
     }
 
     @PostMapping
@@ -34,6 +34,6 @@ public class WishlistController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long productId,
                        @LoginMember Member member) {
-        wishlistService.removeWish(member.getId(), productId);
+        wishlistService.removeWish(member, productId);
     }
 }
