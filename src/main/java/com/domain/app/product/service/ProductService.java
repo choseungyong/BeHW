@@ -1,5 +1,7 @@
 package com.domain.app.product.service;
 
+import com.domain.app.category.domain.Category;
+import com.domain.app.category.repository.CategoryRepository;
 import com.domain.app.product.domain.Product;
 import com.domain.app.product.dto.ProductRequestDto;
 import com.domain.app.product.dto.ProductResponseDto;
@@ -7,8 +9,10 @@ import com.domain.app.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getPage(Pageable pageable) {
@@ -37,13 +42,20 @@ public class ProductService {
         return toResponseDto(product);
     }
 
+    @Transactional
     public ProductResponseDto save(ProductRequestDto requestDto){
         validateName(requestDto.getName());
+
+        Category category = categoryRepository.findById(requestDto.getCategoryId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."
+                ));
 
         Product product = Product.builder()
                 .name(requestDto.getName())
                 .price(requestDto.getPrice())
                 .imageUrl(requestDto.getImageUrl())
+                .category(category)
                 .build();
 
         Product saved = productRepository.save(product);
@@ -53,11 +65,17 @@ public class ProductService {
     public ProductResponseDto update(Long id, ProductRequestDto requestDto){
         validateName(requestDto.getName());
 
+        Category category = categoryRepository.findById(requestDto.getCategoryId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."
+                ));
+
         Product product = Product.builder()
                 .id(id)
                 .name(requestDto.getName())
                 .price(requestDto.getPrice())
                 .imageUrl(requestDto.getImageUrl())
+                .category(category)
                 .build();
 
         Product updated = productRepository.save(product);
@@ -80,6 +98,7 @@ public class ProductService {
                 .name(product.getName())
                 .price(product.getPrice())
                 .imageUrl(product.getImageUrl())
+                .categoryId(product.getCategory().getId())
                 .build();
     }
 }

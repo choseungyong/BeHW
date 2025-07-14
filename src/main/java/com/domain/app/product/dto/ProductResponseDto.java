@@ -14,12 +14,14 @@ public class ProductResponseDto {
     private final String name;
     private final int price;
     private final String imageUrl;
+    private Long categoryId;
 
     @Builder
-    public ProductResponseDto(Long id, String name, int price, String imageUrl){
+    public ProductResponseDto(Long id, String name, int price, String imageUrl, Long categoryId){
         this.id = id;
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.categoryId = categoryId;
     }
 }

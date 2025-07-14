@@ -30,11 +30,14 @@ public class WishlistService {
                 .map(w -> new WishlistResponseDto(w.getProduct().getId()));
     }
 
-    // **테스트 호환용** List 반환 메서드 추가
     public List<WishlistResponseDto> getWishes(Member member) {
-        return getWishes(member, Pageable.unpaged())
-                .getContent();
+        return wishlistRepository.findAllWithProductByMember(member).stream()
+                .map(w -> new WishlistResponseDto(
+                        w.getProduct().getId()
+                ))
+                .collect(Collectors.toList());
     }
+
 
     @Transactional
     public void addWish(Member member, WishlistRequestDto req) {

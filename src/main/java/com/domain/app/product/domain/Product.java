@@ -1,8 +1,10 @@
 package com.domain.app.product.domain;
 
+import com.domain.app.category.domain.Category;
 import com.domain.app.wishlist.domain.Wishlist;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,4 +28,12 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wishlist> wishes = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 }

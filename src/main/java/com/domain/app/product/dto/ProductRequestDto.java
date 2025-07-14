@@ -21,4 +21,6 @@ public class ProductRequestDto {
     private int price;
 
     private String imageUrl;
+
+    private Long categoryId;
 }

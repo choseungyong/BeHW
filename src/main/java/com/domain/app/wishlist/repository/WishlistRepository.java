@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.domain.app.wishlist.domain.Wishlist;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
@@ -17,4 +19,9 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     Optional<Wishlist> findByMemberAndProduct(Member member, Product product);
 
     void deleteByMemberAndProduct(Member member, Product product);
+
+    @Query("SELECT w FROM Wishlist w " +
+            "JOIN FETCH w.product p " +
+            "WHERE w.member = :member")
+    List<Wishlist> findAllWithProductByMember(@Param("member") Member member);
 }
