@@ -15,3 +15,7 @@ INSERT INTO products (name, price, image_url, category_id) VALUES
       (SELECT id FROM category WHERE name = '식품')),
   ('핫도그',             5200, 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png',
       (SELECT id FROM category WHERE name = '식품'));
+
+INSERT INTO options (name, quantity, product_id) VALUES
+  ('기본 옵션',        10, 1),
+  ('추가 토핑 옵션',   5,  1);

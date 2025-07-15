@@ -26,6 +26,7 @@ public class Member {
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Wishlist> wishes = new ArrayList<>();
 
     public void addWish(Wishlist wishlist) {

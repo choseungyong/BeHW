@@ -1,6 +1,7 @@
 package com.domain.app.product.domain;
 
 import com.domain.app.category.domain.Category;
+import com.domain.app.option.domain.Option;
 import com.domain.app.wishlist.domain.Wishlist;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,7 @@ public class Product {
     private String imageUrl;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Wishlist> wishes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -35,5 +37,14 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Option> options = new ArrayList<>();
+
+    public void addOption(Option option) {
+        options.add(option);
+        option.setProduct(this);
     }
 }

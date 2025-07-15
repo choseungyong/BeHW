@@ -30,3 +30,13 @@ CREATE TABLE wish (
     CONSTRAINT fk_wish_member  FOREIGN KEY (member_id)  REFERENCES member(id),
     CONSTRAINT fk_wish_product FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+CREATE TABLE IF NOT EXISTS options (
+    id           BIGINT       AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(50)  NOT NULL,
+    quantity     INT          NOT NULL,
+    product_id   BIGINT       NOT NULL,
+    CONSTRAINT fk_option_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(id)
+);
