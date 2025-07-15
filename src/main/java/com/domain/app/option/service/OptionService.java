@@ -60,4 +60,16 @@ public class OptionService {
     public void deleteOption(Long id) {
         optionRepository.deleteById(id);
     }
+
+    @Transactional
+    public void subtractOptionQuantity(Long productId, Long optionId, int amount) {
+        Option opt = optionRepository.findById(optionId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 옵션입니다. id=" + optionId));
+
+        if (opt.getProduct().getId() != productId) {
+            throw new IllegalArgumentException("상품과 옵션이 매핑되지 않습니다.");
+        }
+
+        opt.subtract(amount);
+    }
 }
